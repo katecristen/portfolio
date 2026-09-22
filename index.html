@@ -3,15 +3,27 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="theme-color" content="#0B0B0F" />
+    <meta name="theme-color" content="#FAF8F6" />
+    <script>
+      try {
+        const savedTheme = localStorage.getItem('portfolio-theme');
+        document.documentElement.dataset.theme = savedTheme === 'light' || savedTheme === 'dark'
+          ? savedTheme
+          : (matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+      } catch {
+        document.documentElement.dataset.theme = matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+      }
+      document.querySelector('meta[name="theme-color"]').content =
+        document.documentElement.dataset.theme === 'dark' ? '#181616' : '#FAF8F6';
+    </script>
     <meta
       name="description"
-      content="Kate Cristen Santos portfolio — a premium, minimalist dark-mode portfolio for a mobile and web developer focused on accessible, modern digital experiences."
+      content="Kate Cristen Santos is a BSIT student specializing in mobile and web applications, with experience in software development, project management, and student organization leadership."
     />
     <meta property="og:title" content="Kate Cristen Santos | Mobile & Web Developer" />
     <meta
       property="og:description"
-      content="Minimal, premium personal portfolio with a refined feminine touch through lavender accents, elegant spacing, and modern typography."
+      content="Explore Kate Cristen Santos's mobile and web projects, technical skills, leadership experience, education, and certifications."
     />
     <meta property="og:type" content="website" />
     <meta property="og:image" content="/og-image.svg" />
@@ -19,13 +31,13 @@
     <meta name="twitter:title" content="Kate Cristen Santos | Mobile & Web Developer" />
     <meta
       name="twitter:description"
-      content="Elegant portfolio website with premium dark UI, smooth motion, and polished project presentation."
+      content="Mobile and web projects, technical skills, leadership experience, education, and certifications."
     />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%230B0B0F'/%3E%3Cpath d='M18 43L31 18h6L25 43h-7Zm14 0 13-25h6L38 43h-6Z' fill='%23A78BFA'/%3E%3C/svg%3E" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23181616'/%3E%3Cpath d='M18 43L31 18h6L25 43h-7Zm14 0 13-25h6L38 43h-6Z' fill='%23E1ACAC'/%3E%3C/svg%3E" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=DM+Sans:wght@400;500;600;700;800&display=swap"
       rel="stylesheet"
     />
     <title>Kate Cristen Santos | Mobile & Web Developer</title>

@@ -1,381 +1,69 @@
 import { useEffect, useMemo, useState } from 'react';
-import { motion, useReducedMotion, useScroll } from 'framer-motion';
-import { ArrowRight, MoveUpRight, Send, Sparkles } from 'lucide-react';
-import {
-  aboutCopy,
-  certifications,
-  highlights,
-  heroIntro,
-  navLinks,
-  projects,
-  socials,
-  techStacks,
-  timeline,
-} from './data';
-import {
-  CertificationCard,
-  Input,
-  MagneticButton,
-  ProjectCard,
-  Reveal,
-  SectionHeading,
-  SocialButton,
-  StackGroup,
-  Textarea,
-  TimelineItem,
-} from './components';
+import { motion, useReducedMotion, useScroll, useTransform } from 'framer-motion';
+import { ArrowDown, ArrowRight, ArrowUpRight, Github, Linkedin, Mail, Moon, Sun } from 'lucide-react';
+import { aboutCopy, certifications, education, experience, highlights, heroIntro, navLinks, projects, seminars, socials, techStacks } from './data';
+import { MagneticButton, Reveal } from './components';
 
-type FormState = {
-  name: string;
-  email: string;
-  message: string;
-};
-
-const initialForm: FormState = {
-  name: '',
-  email: '',
-  message: '',
-};
-
-function CursorGlow() {
-  const prefersReducedMotion = useReducedMotion();
-  const [position, setPosition] = useState({ x: 0, y: 0 });
-  const [visible, setVisible] = useState(false);
-
-  useEffect(() => {
-    if (prefersReducedMotion || typeof window === 'undefined') return;
-
-    const media = window.matchMedia('(pointer: fine)');
-    if (!media.matches) return;
-
-    const handleMove = (event: PointerEvent) => {
-      setVisible(true);
-      setPosition({ x: event.clientX, y: event.clientY });
-    };
-
-    const handleLeave = () => setVisible(false);
-
-    window.addEventListener('pointermove', handleMove);
-    window.addEventListener('pointerleave', handleLeave);
-
-    return () => {
-      window.removeEventListener('pointermove', handleMove);
-      window.removeEventListener('pointerleave', handleLeave);
-    };
-  }, [prefersReducedMotion]);
-
-  if (prefersReducedMotion) return null;
-
-  return (
-    <motion.div
-      aria-hidden="true"
-      className="pointer-events-none fixed left-0 top-0 z-0 h-72 w-72 rounded-full bg-[radial-gradient(circle,rgba(167,139,250,0.22)_0%,rgba(167,139,250,0.14)_35%,rgba(167,139,250,0)_72%)] blur-3xl"
-      animate={{ x: position.x - 144, y: position.y - 144, opacity: visible ? 1 : 0 }}
-      transition={{ type: 'spring', stiffness: 80, damping: 16, mass: 0.45 }}
-    />
-  );
+const featuredSkills = ['React.js', 'Flutter', 'TypeScript', 'Vue.js', 'Figma', 'Node.js', 'PostgreSQL', 'Tailwind CSS'];
+type FormState = { name: string; email: string; message: string };
+const initialForm: FormState = { name: '', email: '', message: '' };
+function SectionTitle({ number, eyebrow, title, description }: { number: string; eyebrow: string; title: string; description?: string }) {
+  return <div className="section-title"><div className="section-title-meta"><span>{number} / 08</span><span>{eyebrow}</span></div><div><h2>{title}</h2>{description && <p>{description}</p>}</div></div>;
 }
-
+function BrowserPreview({ kind = 0 }: { kind?: number }) {
+  return <div className={`browser-preview preview-${kind}`} aria-hidden="true"><div className="browser-bar"><div className="browser-dots"><i/><i/><i/></div><span>{['oscaflow.app / dashboard', 'itso.nu-dasmariñas.edu / tracker', 'beautiverse.digi / shop'][kind]}</span><span>+</span></div>
+    {kind === 0 ? <div className="preview-inner osca-ui"><div className="preview-side"><b>OSCA<span>Flow</span></b><small>OVERVIEW</small><em>Dashboard</em><small>OPERATIONS</small><em>Records</em><em>Applications</em><em>Reports</em></div><div className="preview-main"><small>MONDAY, MAY 12</small><h4>Good morning, Admin.</h4><p>Here's your operations overview.</p><div className="preview-stats"><div><small>APPLICATIONS</small><strong>1,284</strong><span>↗ 12.8%</span></div><div><small>FOR REVIEW</small><strong>048</strong><span>New records</span></div></div><div className="preview-chart"><small>Monthly activity</small><div className="chart-bars">{[34,52,43,68,57,83,70,91,73,100,86,95].map((h,i)=><i key={i} style={{height:`${h}%`}} />)}</div></div></div></div> : kind === 1 ? <div className="preview-inner tracker-ui"><div className="tracker-head"><strong>NUD <span>ITSO</span></strong><span>Appointments & ID Tracking</span></div><div className="tracker-body"><div className="tracker-progress"><small>TRACK YOUR ID</small><h4>Every step, in view.</h4><div className="tracker-steps"><span className="done">01<br/>Booked</span><span className="done">02<br/>Verified</span><span>03<br/>Printing</span><span>04<br/>Ready</span></div></div><div className="tracker-list"><small>UPCOMING APPOINTMENTS</small><p><b>12</b><span>May<br/>Monday</span><em>Photo capture<br/><small>10:30 AM</small></em></p><p><b>16</b><span>May<br/>Friday</span><em>ID release<br/><small>2:00 PM</small></em></p></div></div></div> : <div className="preview-inner beauty-ui"><div className="beauty-head"><span>BEAUTIVERSE</span><small>DISCOVER &nbsp; SHOP &nbsp; ABOUT</small><span>♡ &nbsp; ◇</span></div><div className="beauty-body"><small>THE EVERYDAY EDIT</small><h4>Beauty in<br/><i>every detail.</i></h4><p>Thoughtfully curated essentials<br/>for your daily ritual.</p><span className="beauty-link">EXPLORE COLLECTION →</span><div className="beauty-product"><div className="beauty-bottle"/><small>SKINCARE / 01</small></div></div></div>}
+  </div>;
+}
+function Showcase() {
+  const [active, setActive] = useState(0);
+  return <div className="showcase" aria-label="Interactive project showcase"><div className="showcase-top"><span>01 — SELECTED INTERFACES</span><span>INTERACTIVE PREVIEW ↗</span></div><div className="showcase-stage"><div className="showcase-grid" aria-hidden="true"/><div className="showcase-browser"><BrowserPreview kind={active}/></div><div className="showcase-phone" aria-hidden="true"><div className="phone-speaker"/><span className="phone-brand">{active === 0 ? 'OSCAFlow' : active === 1 ? 'NUD ITSO' : 'BeautiVerse'}</span><div className="phone-orb">{active === 0 ? 'OCR' : active === 1 ? 'ID' : 'B'}</div><small>{active === 0 ? 'Document scan complete' : active === 1 ? 'Your ID is on its way' : 'Discover your ritual'}</small><div className="phone-lines"><i/><i/><i/></div><div className="phone-action">{active === 0 ? 'View record' : active === 1 ? 'Track progress' : 'Explore'}</div></div><div className="showcase-code" aria-hidden="true"><div><i/><i/><i/><span>app.tsx</span></div><code><span>const</span> build = <em>{'{'}</em><br/> &nbsp; craft: <b>'purpose'</b>,<br/> &nbsp; detail: <b>'everywhere'</b><br/><em>{'}'}</em>;</code></div><span className="showcase-corner">DESIGN / DEVELOP / DELIVER</span></div><div className="showcase-bottom"><div><b>{projects[active].title}</b><span>{projects[active].role}</span></div><div className="showcase-controls" aria-label="Choose project preview">{projects.map((project, i)=><button key={project.title} type="button" className={active===i?'active':''} onClick={()=>setActive(i)} aria-label={`Show ${project.title} preview`} aria-pressed={active===i}>{String(i+1).padStart(2,'0')}</button>)}</div></div><div className="showcase-facts"><p><span>FOCUS</span><b>Mobile & web applications</b></p><p><span>CURRENTLY</span><b>BSIT · Mobile and Web Applications</b></p></div></div>;
+}
+function ProjectFeature({ project, index }: { project: typeof projects[number]; index: number }) {
+  return <Reveal><article className={`project-feature ${index % 2 ? 'reverse' : ''}`}><div className="project-copy"><div className="project-kicker"><span>0{index+1}</span><span>FEATURED PROJECT</span></div><h3>{project.title}</h3>{project.subtitle && <p className="project-subtitle">{project.subtitle}</p>}<p className="project-role">{project.role}</p><ul>{project.details.map(detail=><li key={detail}>{detail}</li>)}</ul><div className="project-tags">{project.stack.map(item=><span key={item}>{item}</span>)}</div></div><div className="project-visual"><span className="visual-label">{index === 0 ? 'OPERATIONS / MOBILE + WEB' : index === 1 ? 'APPOINTMENTS / TRACKING' : 'WEB / SECURITY'}</span><BrowserPreview kind={index}/><div className="visual-index">0{index+1}<span>/ 03</span></div></div></article></Reveal>;
+}
 function App() {
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
+  const [menuOpen, setMenuOpen] = useState(false);
   const [form, setForm] = useState<FormState>(initialForm);
   const [status, setStatus] = useState<'idle' | 'sent'>('idle');
-  const { scrollYProgress } = useScroll();
-
   const mailtoHref = useMemo(() => {
     const subject = encodeURIComponent(`Portfolio inquiry from ${form.name || 'a visitor'}`);
     const body = encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`);
     return `mailto:hello@katecristensantos.com?subject=${subject}&body=${body}`;
   }, [form.email, form.message, form.name]);
-
-  const handleChange =
-    (field: keyof FormState) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-      setForm((current) => ({ ...current, [field]: event.target.value }));
-    };
-
+  const handleChange = (field: keyof FormState) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setForm(current => ({ ...current, [field]: event.target.value }));
+    setStatus('idle');
+  };
   const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     window.location.href = mailtoHref;
     setStatus('sent');
   };
-
-  return (
-    <div className="relative min-h-screen overflow-x-hidden bg-bg text-white selection:bg-accent/30 selection:text-white">
-      <CursorGlow />
-      <motion.div style={{ scaleX: scrollYProgress }} className="fixed left-0 top-0 z-50 h-px w-full origin-left bg-gradient-to-r from-transparent via-accent to-transparent" />
-
-      <div className="pointer-events-none absolute inset-0 -z-10 overflow-hidden">
-        <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_left,rgba(167,139,250,0.16),transparent_28%),radial-gradient(circle_at_top_right,rgba(196,181,253,0.12),transparent_24%),linear-gradient(to_bottom,rgba(255,255,255,0.04),transparent_20%)]" />
-        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.045)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-[size:72px_72px] [mask-image:radial-gradient(circle_at_center,black_45%,transparent_86%)]" />
-        <motion.div
-          className="absolute -left-24 top-24 h-80 w-80 rounded-full bg-accent/10 blur-3xl"
-          animate={{ y: [0, -18, 0], x: [0, 12, 0] }}
-          transition={{ duration: 12, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
-        />
-        <motion.div
-          className="absolute right-[-80px] top-[28rem] h-96 w-96 rounded-full bg-[#c4b5fd]/10 blur-3xl"
-          animate={{ y: [0, 16, 0], x: [0, -10, 0] }}
-          transition={{ duration: 15, repeat: Number.POSITIVE_INFINITY, ease: 'easeInOut' }}
-        />
-      </div>
-
-      <header className="sticky top-0 z-40 border-b border-white/8 bg-bg/70 backdrop-blur-xl">
-        <div className="mx-auto flex w-full max-w-7xl items-center justify-between gap-4 px-5 py-4 sm:px-6 lg:px-8">
-          <a href="#hero" className="group inline-flex items-center gap-3 text-sm font-semibold tracking-[0.28em] text-white">
-            <span className="flex h-10 w-10 items-center justify-center rounded-2xl border border-white/10 bg-white/5 text-accent transition group-hover:border-accent/30 group-hover:bg-white/10">
-              K
-            </span>
-            <span className="hidden sm:inline">KATE CRISTEN SANTOS</span>
-          </a>
-
-          <nav className="hidden items-center gap-2 lg:flex" aria-label="Primary">
-            {navLinks.map((link) => (
-              <a key={link.label} href={link.href} className="rounded-full px-4 py-2 text-sm text-muted transition hover:bg-white/5 hover:text-white">
-                {link.label}
-              </a>
-            ))}
-          </nav>
-
-          <a href="#contact" className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-white transition hover:border-accent/35 hover:bg-white/10">
-            Let’s Talk
-            <ArrowRight className="h-4 w-4" aria-hidden="true" />
-          </a>
-        </div>
-      </header>
-
-      <main className="relative z-10">
-        <section id="hero" className="mx-auto max-w-7xl px-5 pb-20 pt-14 sm:px-6 md:pb-28 md:pt-20 lg:px-8 lg:pt-24">
-          <div className="grid items-center gap-14 lg:grid-cols-[1.18fr_0.82fr] lg:gap-10">
-            <Reveal>
-              <div className="space-y-8">
-                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-xs font-medium text-muted backdrop-blur-md">
-                  <Sparkles className="h-4 w-4 text-accent" aria-hidden="true" />
-                  Minimal. Premium. Built with intention.
-                </div>
-
-                <div className="space-y-5">
-                  <p className="text-xs font-semibold uppercase tracking-[0.4em] text-accent/80">Mobile & Web Developer</p>
-                  <h1 className="max-w-4xl text-5xl font-bold leading-[0.92] tracking-tight text-white sm:text-6xl md:text-7xl lg:text-[5.9rem]">
-                    Kate Cristen Santos
-                  </h1>
-                  <p className="max-w-2xl text-lg leading-8 text-muted md:text-xl">{heroIntro}</p>
-                </div>
-
-                <div className="flex flex-col gap-3 sm:flex-row">
-                  <MagneticButton href="#projects" icon={<MoveUpRight className="h-4 w-4" aria-hidden="true" />}>
-                    View Projects
-                  </MagneticButton>
-                  <MagneticButton href="/resume.pdf" variant="secondary" icon={<Send className="h-4 w-4" aria-hidden="true" />}>
-                    Download Resume
-                  </MagneticButton>
-                </div>
-
-                <ul className="grid gap-4 pt-2 sm:grid-cols-3">
-                  {highlights.map((item) => (
-                    <li
-                      key={item.label}
-                      className="rounded-[24px] border border-white/10 bg-white/[0.035] p-5 backdrop-blur-md transition duration-300 hover:border-accent/25 hover:bg-white/[0.055]"
-                    >
-                      <p className="text-2xl font-bold text-white">{item.value}</p>
-                      <p className="mt-2 text-sm leading-6 text-muted">{item.label}</p>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </Reveal>
-
-            <Reveal delay={0.15}>
-              <div className="relative mx-auto max-w-xl">
-                <div className="absolute -left-6 top-8 h-28 w-28 rounded-full bg-accent/15 blur-3xl" />
-                <div className="absolute right-0 top-24 h-40 w-40 rounded-full bg-[#c4b5fd]/15 blur-3xl" />
-                <div className="relative overflow-hidden rounded-[36px] border border-white/10 bg-[linear-gradient(180deg,rgba(255,255,255,0.08),rgba(255,255,255,0.03))] p-6 shadow-[0_30px_90px_rgba(0,0,0,0.4)] backdrop-blur-2xl">
-                  <div className="absolute inset-0 bg-[radial-gradient(circle_at_top_right,rgba(167,139,250,0.2),transparent_28%),linear-gradient(135deg,transparent,rgba(255,255,255,0.03),transparent)]" />
-                  <div className="relative grid gap-4">
-                    <div className="flex items-center justify-between rounded-[28px] border border-white/10 bg-[#111118]/80 p-5">
-                      <div>
-                        <p className="text-xs uppercase tracking-[0.35em] text-muted">Focus</p>
-                        <p className="mt-2 text-xl font-semibold text-white">Secure product interfaces</p>
-                      </div>
-                      <div className="rounded-2xl border border-accent/25 bg-accent/10 px-4 py-3 text-right">
-                        <p className="text-xs text-accent">Currently</p>
-                        <p className="mt-1 text-sm text-white">Building with React, Flutter, and Supabase</p>
-                      </div>
-                    </div>
-
-                    <div className="grid gap-4 sm:grid-cols-2">
-                      <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-                        <p className="text-sm text-muted">Style direction</p>
-                        <p className="mt-3 text-lg font-semibold text-white">Minimal, editorial, and calm</p>
-                        <p className="mt-3 text-sm leading-7 text-muted">Lavender accents, generous spacing, and quiet motion shape the visual language.</p>
-                      </div>
-                      <div className="rounded-[28px] border border-white/10 bg-white/[0.04] p-5">
-                        <p className="text-sm text-muted">Design lens</p>
-                        <p className="mt-3 text-lg font-semibold text-white">Woman in Tech sophistication</p>
-                        <p className="mt-3 text-sm leading-7 text-muted">Elegant, polished, and professional without leaning into overly decorative motifs.</p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-
-        <section id="about" className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <Reveal>
-            <SectionHeading eyebrow="About" title="A thoughtful developer with a calm, premium point of view." description={aboutCopy} />
-          </Reveal>
-          <Reveal delay={0.08} className="mt-10">
-            <div className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr]">
-              <div className="rounded-[32px] border border-white/10 bg-white/[0.035] p-8 shadow-[0_24px_70px_rgba(0,0,0,0.22)] backdrop-blur-sm">
-                <p className="text-sm uppercase tracking-[0.34em] text-accent/80">Professional introduction</p>
-                <p className="mt-5 text-lg leading-8 text-[#E7E7EE]">
-                  I build interfaces that feel refined, reliable, and easy to use. My work centers on strong visual structure, accessibility, and practical development habits that help ideas become polished digital products.
-                </p>
-                <p className="mt-5 text-lg leading-8 text-[#E7E7EE]">
-                  From mobile apps to responsive websites, I like creating experiences that balance technical clarity with subtle elegance.
-                </p>
-              </div>
-              <div className="rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(167,139,250,0.14),rgba(255,255,255,0.03))] p-8 shadow-[0_24px_70px_rgba(0,0,0,0.22)] backdrop-blur-sm">
-                <p className="text-sm uppercase tracking-[0.34em] text-accent/80">What I value</p>
-                <div className="mt-6 grid gap-4 sm:grid-cols-2">
-                  {['Accessibility first', 'Clean architecture', 'Modern UI systems', 'Fast loading experiences'].map((item) => (
-                    <div key={item} className="rounded-[24px] border border-white/10 bg-black/20 px-4 py-5 text-sm text-white">
-                      {item}
-                    </div>
-                  ))}
-                </div>
-                <div className="mt-6 rounded-[24px] border border-accent/20 bg-accent/10 p-5 text-sm leading-7 text-[#ECEAFE]">
-                  I enjoy designing for people first, then translating that intent into production-ready code with a visual language that feels calm, premium, and memorable.
-                </div>
-              </div>
-            </div>
-          </Reveal>
-        </section>
-
-        <section id="tech-stack" className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <Reveal>
-            <SectionHeading eyebrow="Tech Stack" title="A focused toolkit for web, mobile, backend, and design." description="The stack is presented as elegant, readable groups so the visual system stays clean while still communicating breadth." />
-          </Reveal>
-          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-3">
-            {techStacks.map((group, index) => (
-              <Reveal key={group.category} delay={index * 0.05}>
-                <StackGroup category={group.category} items={group.items} />
-              </Reveal>
-            ))}
-          </div>
-        </section>
-
-        <section id="projects" className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <Reveal>
-            <SectionHeading eyebrow="Featured Projects" title="Selected work presented with premium, hover-rich cards." description="Each project card pairs a strong visual preview with concise copy, tech tags, and direct action links." />
-          </Reveal>
-          <div className="mt-10 grid gap-6 lg:grid-cols-2">
-            {projects.map((project, index) => (
-              <Reveal key={project.title} delay={index * 0.05}>
-                <ProjectCard {...project} />
-              </Reveal>
-            ))}
-          </div>
-        </section>
-
-        <section id="experience" className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <Reveal>
-            <SectionHeading eyebrow="Experience Timeline" title="A clean vertical narrative of growth and craft." description="The timeline keeps the page editorial and easy to scan while still giving room for motion and hierarchy." />
-          </Reveal>
-          <div className="mt-10 grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-            <Reveal className="rounded-[32px] border border-white/10 bg-white/[0.03] p-8 shadow-[0_24px_70px_rgba(0,0,0,0.22)]">
-              <p className="text-sm uppercase tracking-[0.34em] text-accent/80">Selected focus areas</p>
-              <div className="mt-5 space-y-4 text-sm leading-7 text-muted">
-                <p>• Accessible UI development across mobile and web platforms</p>
-                <p>• Component-driven design systems with careful spacing and motion</p>
-                <p>• Modern backend services with Supabase, Firebase, Node.js, and Express</p>
-                <p>• Product thinking that keeps user trust and clarity at the center</p>
-              </div>
-            </Reveal>
-            <Reveal delay={0.1}>
-              <ol className="relative border-l border-white/10 pl-6">
-                {timeline.map((entry) => (
-                  <TimelineItem key={`${entry.year}-${entry.title}`} {...entry} />
-                ))}
-              </ol>
-            </Reveal>
-          </div>
-        </section>
-
-        <section id="certifications" className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <Reveal>
-            <SectionHeading eyebrow="Certifications" title="Proof of technical foundations, presented with restraint." description="The cards stay clean and premium so the certifications feel like part of the overall editorial system." />
-          </Reveal>
-          <div className="mt-10 grid gap-5 md:grid-cols-2">
-            {certifications.map((cert, index) => (
-              <Reveal key={cert.name} delay={index * 0.05}>
-                <CertificationCard {...cert} />
-              </Reveal>
-            ))}
-          </div>
-        </section>
-
-        <section id="contact" className="mx-auto max-w-7xl px-5 py-20 sm:px-6 lg:px-8 lg:py-28">
-          <Reveal>
-            <SectionHeading eyebrow="Contact" title="Minimal contact, direct and easy to use." description="The form is lightweight and the social links give a clear path to connect without visual noise." />
-          </Reveal>
-          <div className="mt-10 grid gap-6 lg:grid-cols-[1.02fr_0.98fr]">
-            <Reveal>
-              <form onSubmit={handleSubmit} className="rounded-[32px] border border-white/10 bg-white/[0.035] p-7 shadow-[0_24px_70px_rgba(0,0,0,0.22)] backdrop-blur-sm">
-                <div className="grid gap-4 md:grid-cols-2">
-                  <Input label="Name" name="name" value={form.name} onChange={handleChange('name')} placeholder="Your name" autoComplete="name" />
-                  <Input label="Email" name="email" type="email" value={form.email} onChange={handleChange('email')} placeholder="Your email" autoComplete="email" />
-                </div>
-                <div className="mt-4">
-                  <Textarea label="Message" name="message" value={form.message} onChange={handleChange('message')} placeholder="Tell me about your project or collaboration idea" />
-                </div>
-                <div className="mt-5 flex flex-col gap-3 sm:flex-row sm:items-center">
-                  <button
-                    type="submit"
-                    className="inline-flex items-center justify-center gap-2 rounded-full bg-accent px-5 py-3 text-sm font-semibold text-bg transition hover:bg-accent-hover focus:outline-none focus-visible:ring-2 focus-visible:ring-accent focus-visible:ring-offset-2 focus-visible:ring-offset-bg"
-                  >
-                    Send Message
-                    <Send className="h-4 w-4" aria-hidden="true" />
-                  </button>
-                  <p className="text-sm text-muted">{status === 'sent' ? 'Your email client is opening.' : 'This form opens a prefilled email draft for quick contact.'}</p>
-                </div>
-              </form>
-            </Reveal>
-
-            <Reveal delay={0.1}>
-              <div className="rounded-[32px] border border-white/10 bg-[linear-gradient(180deg,rgba(167,139,250,0.12),rgba(255,255,255,0.03))] p-7 shadow-[0_24px_70px_rgba(0,0,0,0.22)] backdrop-blur-sm">
-                <p className="text-sm uppercase tracking-[0.34em] text-accent/80">Social Links</p>
-                <div className="mt-5 flex flex-wrap gap-3">
-                  <SocialButton label="GitHub" href={socials[0].href} icon="github" />
-                  <SocialButton label="LinkedIn" href={socials[1].href} icon="linkedin" />
-                  <SocialButton label="Email" href={socials[2].href} icon="mail" />
-                </div>
-                <div className="mt-8 rounded-[26px] border border-white/10 bg-black/20 p-5">
-                  <p className="text-sm uppercase tracking-[0.3em] text-muted">Why this works</p>
-                  <p className="mt-4 text-sm leading-7 text-[#E7E7EE]">
-                    The layout emphasizes clarity, whitespace, and subtle lavender highlights so the site feels confident, feminine, and professional without losing the minimalist edge.
-                  </p>
-                </div>
-                <a
-                  href={socials[2].href}
-                  className="mt-6 inline-flex items-center gap-2 text-sm font-medium text-accent transition hover:text-accent-hover"
-                >
-                  Open email <MoveUpRight className="h-4 w-4" aria-hidden="true" />
-                </a>
-              </div>
-            </Reveal>
-          </div>
-        </section>
-      </main>
-
-      <footer className="border-t border-white/8 bg-bg/80">
-        <div className="mx-auto flex w-full max-w-7xl flex-col gap-3 px-5 py-8 text-sm text-muted sm:px-6 lg:flex-row lg:items-center lg:justify-between lg:px-8">
-          <p>Designed &amp; Developed by Kate Cristen Santos</p>
-          <p className="text-white/65">Premium dark-mode portfolio with a refined lavender accent system.</p>
-        </div>
-      </footer>
-    </div>
-  );
+  const reducedMotion = useReducedMotion();
+  const { scrollYProgress } = useScroll();
+  const heroShift = useTransform(scrollYProgress, [0, 0.18], [0, reducedMotion ? 0 : -42]);
+  useEffect(() => { document.documentElement.dataset.theme = theme; document.querySelector('meta[name="theme-color"]')?.setAttribute('content', theme === 'dark' ? '#181616' : '#FAF8F6'); }, [theme]);
+  const toggleTheme = () => setTheme(current => { const next = current === 'light' ? 'dark' : 'light'; try { localStorage.setItem('portfolio-theme', next); } catch { /* unavailable */ } return next; });
+  return <div className="site-shell"><motion.div className="reading-progress" style={{scaleX:scrollYProgress}}/><header className="site-header"><div className="header-inner"><a className="brand" href="#hero" aria-label="Kate Cristen Santos, back to top"><span className="brand-mark">K<span>.</span></span><span className="brand-name">KATE CRISTEN SANTOS<small>DEVELOPER / PROJECT LEADER</small></span></a><nav className={menuOpen?'nav-links open':'nav-links'} aria-label="Primary">{navLinks.map(link=><a key={link.href} href={link.href} onClick={()=>setMenuOpen(false)}>{link.label}</a>)}</nav><div className="header-actions"><button className="theme-button" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme==='light'?'dark':'light'} mode`} aria-pressed={theme==='dark'}>{theme==='light'?<Moon size={18}/>:<Sun size={18}/>}</button><a className="header-contact" href="#contact">LET'S TALK <ArrowUpRight size={15}/></a><button className="menu-button" type="button" onClick={()=>setMenuOpen(!menuOpen)} aria-label="Toggle navigation" aria-expanded={menuOpen}>{menuOpen?'CLOSE':'MENU'}</button></div></div></header><main>
+    <section id="hero" className="hero section-wrap"><div className="hero-intro"><span className="eyebrow"><span className="eyebrow-line"/> MOBILE & WEB DEVELOPER</span><h1><span>Kate</span><span>Cristen</span><span className="hero-last">Santos<span className="hero-period">.</span></span></h1><p className="hero-description">{heroIntro}</p><div className="hero-actions"><MagneticButton href="#projects" className="editorial-button" icon={<ArrowUpRight size={17}/>}>View projects</MagneticButton><MagneticButton href="#contact" variant="secondary" className="editorial-button secondary" icon={<ArrowRight size={17}/>}>Get in touch</MagneticButton></div><a className="resume-link" href="/resume.pdf" target="_blank" rel="noopener noreferrer">View / download resume <ArrowUpRight size={15} aria-hidden="true"/></a><div className="hero-scroll"><ArrowDown size={14}/><span>SCROLL TO EXPLORE</span></div></div><motion.div className="hero-visual" style={{y:heroShift}}><Showcase/></motion.div><div className="hero-footer"><span>BASED IN THE PHILIPPINES</span><span>WEB · MOBILE · LEADERSHIP</span><span>PORTFOLIO / {new Date().getFullYear()}</span></div></section>
+    <section id="about" className="section-wrap content-section about-section"><div className="ambient-word" aria-hidden="true">ABOUT</div><Reveal><SectionTitle number="01" eyebrow="PROFESSIONAL SUMMARY" title={'Curious by nature.\nIntentional by design.'} description={aboutCopy}/></Reveal><div className="about-grid"><Reveal><div className="about-statement"><p>I am a BSIT student specializing in Mobile and Web Applications. Through academic and organizational projects, I have developed practical experience in web and mobile development, project management, and technical leadership.</p><p>I collaborate with software teams, manage project tasks, and contribute to system design, testing, and implementation.</p></div></Reveal><Reveal delay={0.08}><div className="about-aside"><span className="micro-label">WHAT I BRING TO THE TABLE</span><div className="about-list">{['Mobile applications','Web applications','Project coordination','UI/UX design'].map((item,i)=><div key={item}><span>0{i+1}</span><strong>{item}</strong><ArrowUpRight size={16}/></div>)}</div><p>I work with frontend and backend technologies, databases, and development tools to turn project requirements into working features.</p><p>Hands-on experience building academic applications with modern tools. Planning tasks, supporting development, and coordinating team progress.</p></div></Reveal></div><div className="metrics-strip">{highlights.map(item=><div key={item.label}><strong>{item.value}</strong><span>{item.label}</span></div>)}</div></section>
+    <section id="tech-stack" className="content-section skills-section"><div className="section-wrap"><Reveal><SectionTitle number="02" eyebrow="SKILLS & TOOLS" title={'A toolkit built\nfor making things work.'}/></Reveal></div><div className="marquee" aria-label="Featured technologies"><div className="marquee-track">{[...featuredSkills,...featuredSkills].map((skill,i)=><span key={`${skill}-${i}`}>{skill}<i>✳</i></span>)}</div></div><div className="section-wrap skills-grid">{techStacks.map((group,index)=><Reveal key={group.category} delay={Math.min(index*.04,.2)}><div className="skill-group"><div className="skill-heading"><span>0{index+1}</span><h3>{group.category}</h3></div><div className="skill-items">{group.items.map(item=><span key={item}>{item}</span>)}</div></div></Reveal>)}</div></section>
+    <section id="projects" className="section-wrap content-section projects-section"><div className="ambient-word" aria-hidden="true">WORK</div><Reveal><SectionTitle number="03" eyebrow="SELECTED WORK" title={'Made with purpose.\nBuilt with people.'} description="Applications developed with teams across mobile, web, and security coursework."/></Reveal><div className="projects-list">{projects.map((project,index)=><ProjectFeature key={project.title} project={project} index={index}/>)}</div></section>
+    <section id="experience" className="content-section experience-section"><div className="section-wrap"><Reveal><SectionTitle number="04" eyebrow="LEADERSHIP & ORGANIZATION EXPERIENCE" title={'Leading the work\nbehind the work.'}/></Reveal><div className="experience-grid"><Reveal><div className="experience-intro"><span className="micro-label">HOW I CONTRIBUTE</span>{['Coordinate team tasks and project schedules','Maintain organizational records and announcements','Plan technology events and participant logistics','Support communication across officers and members'].map((item,i)=><div key={item}><span>0{i+1}</span><p>{item}</p></div>)}</div></Reveal><div className="timeline">{experience.map((entry,index)=><Reveal key={`${entry.year}-${entry.title}`} delay={index*.05}><article className="timeline-entry"><span>{entry.year}</span><div><h3>{entry.title}</h3><p className="timeline-org">{entry.organization}</p><ul>{entry.details.map(detail=><li key={detail}>{detail}</li>)}</ul></div></article></Reveal>)}</div></div></div></section>
+    <section id="education" className="section-wrap content-section education-section"><Reveal><SectionTitle number="05" eyebrow="EDUCATION" title={'Always learning.\nAlways building.'}/></Reveal><div className="education-list">{education.map((entry,index)=><Reveal key={entry.school} delay={index*.06}><article><span className="education-number">0{index+1}</span><div><p className="micro-label">{entry.period}</p><h3>{entry.school}</h3><p>{entry.program}</p><p className="muted">{entry.detail}</p></div><ArrowUpRight size={22}/></article></Reveal>)}</div><Reveal><div className="award-line"><span>✳</span><div><p className="micro-label">AWARDS & ACHIEVEMENTS</p><h3>Consistent Dean’s Lister</h3><p>National University – Dasmariñas · First Honors every term except 1st Year, 1st Term (Second Honors).</p></div></div></Reveal></section>
+    <section id="certifications" className="section-wrap content-section credentials-section"><Reveal><SectionTitle number="06" eyebrow="CERTIFICATIONS" title="Validated skills."/></Reveal><div className="credentials-list">{certifications.map((cert,index)=><Reveal key={cert.name} delay={index*.06}><article><span>0{index+1}</span><div><h3>{cert.name}</h3><p>{cert.organization}</p></div><ArrowUpRight size={21}/></article></Reveal>)}</div></section>
+    <section id="seminars" className="section-wrap content-section seminars-section"><Reveal><SectionTitle number="07" eyebrow="TRAINING & SEMINARS" title={'Ideas worth\nstaying curious about.'}/></Reveal><div className="seminar-list">{seminars.map((seminar,index)=><Reveal key={seminar.name} delay={Math.min(index*.025,.15)}><article><span className="seminar-index">{String(index+1).padStart(2,'0')}</span><div><h3>{seminar.name}</h3><p>{seminar.organizer}</p></div><span className="seminar-date">{seminar.date}</span></article></Reveal>)}</div></section>
+    <section id="contact" className="contact-section"><div className="section-wrap"><Reveal><div className="contact-top"><span className="eyebrow">08 / CONTACT</span><span>HAVE SOMETHING IN MIND?</span></div><h2>Let's make<br/><em>something</em> happen<span>.</span></h2><p>Reach out about development projects, collaborations, or opportunities.</p><a className="contact-email" href={socials[2].href}>Open email <ArrowUpRight size={23}/></a><form className="contact-form" onSubmit={handleSubmit}>
+  <div className="contact-form-heading"><span className="micro-label">SEND A MESSAGE</span><span>DIRECT INQUIRY</span></div>
+  <div className="contact-form-row">
+    <label><span>Name</span><input name="name" value={form.name} onChange={handleChange('name')} placeholder="Your name" autoComplete="name" /></label>
+    <label><span>Email</span><input name="email" type="email" value={form.email} onChange={handleChange('email')} placeholder="Your email" autoComplete="email" /></label>
+  </div>
+  <label className="contact-message"><span>Message</span><textarea name="message" value={form.message} onChange={handleChange('message')} placeholder="Tell me about your project or collaboration idea" /></label>
+  <div className="contact-form-action"><button type="submit">Send message <ArrowUpRight size={18} aria-hidden="true"/></button><p role="status">{status === 'sent' ? 'Your email client is opening.' : 'This form opens a prefilled email draft for quick contact.'}</p></div>
+</form><div className="contact-bottom"><div><span className="micro-label">SOCIAL LINKS</span><div className="social-links"><a href={socials[0].href} target="_blank" rel="noreferrer"><Github size={18}/> GitHub <ArrowUpRight size={14}/></a><a href={socials[1].href} target="_blank" rel="noreferrer"><Linkedin size={18}/> LinkedIn <ArrowUpRight size={14}/></a><a href={socials[2].href}><Mail size={18}/> Email <ArrowUpRight size={14}/></a></div></div><div className="collab-note"><span className="micro-label">OPEN TO COLLABORATION</span><p>I enjoy working with teams on mobile and web applications, from planning through implementation.</p></div></div></Reveal></div></section>
+  </main><footer className="site-footer"><div className="section-wrap"><span>© {new Date().getFullYear()} KATE CRISTEN SANTOS</span><a href="#hero">BACK TO TOP ↑</a><span>DESIGNED & BUILT WITH INTENTION</span></div></footer></div>;
 }
-
 export default App;
