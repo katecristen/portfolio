@@ -32,7 +32,7 @@ export const projects: Project[] = [
   {
     title: 'OSCAFlow',
     subtitle: 'An OCR-Assisted Mobile and Intelligent Web System for CSWDO-OSCA Operations',
-    role: 'Capstone Project Â· Project Manager & Developer',
+    role: 'Capstone Project · Project Manager & Developer',
     stack: ['Flutter', 'Vue.js', 'XAMPP'],
     details: [
       'Managed project planning, task assignments, development progress, and team coordination.',
@@ -40,7 +40,7 @@ export const projects: Project[] = [
       'Collaborated throughout system design, development, testing, and implementation.',
     ],
     images: [
-      { src: '/oscaflow-home.png', alt: 'OSCAFlow web landing page for the DasmariÃ±as City OSCA staff portal' },
+      { src: '/oscaflow-home.png', alt: 'OSCAFlow web landing page for the Dasmariñas City OSCA staff portal' },
       { src: '/oscaflow-mobile-landing.jpg', alt: 'OSCAFlow mobile landing page with staff sign in' },
     ],
   },
@@ -53,7 +53,7 @@ export const projects: Project[] = [
       'Contributed to ID appointment management, tracking, notifications, and Google Calendar integration.',
       'Participated in system testing, implementation, and feature refinement.',
     ],
-    images: [{ src: '/nud-itso-id-tracker.png', alt: 'NU DasmariÃ±as ITSO ID Tracker home page with a student ID appointment call to action' }],
+    images: [{ src: '/nud-itso-id-tracker.png', alt: 'NU Dasmariñas ITSO ID Tracker home page with a student ID appointment call to action' }],
   },
   {
     title: 'IOS Rental by Maddy and Cassy',
@@ -82,19 +82,19 @@ export const projects: Project[] = [
 
 export const experience: Experience[] = [
   {
-    year: '2024â€“2025',
+    year: '2024–2025',
     title: 'Secretary',
-    organization: 'NU DasmariÃ±as Computer Society',
+    organization: 'NU Dasmariñas Computer Society',
     details: ['Managed organizational records, announcements, and schedules.', 'Collaborated with officers and members to plan and run technology events and activities.'],
   },
   {
-    year: '2023â€“2024',
+    year: '2023–2024',
     title: 'Event Planner / Coordinator',
-    organization: 'NU DasmariÃ±as Computer Society',
+    organization: 'NU Dasmariñas Computer Society',
     details: ['Planned technology events, programs, and logistics.', 'Coordinated schedules, participants, and committee work during event execution.'],
   },
   {
-    year: '2023â€“2024',
+    year: '2023–2024',
     title: 'Secretary',
     organization: 'Sigma Esports',
     details: ['Managed organizational records and administrative tasks.', 'Helped coordinate activities and communicate with members.'],
@@ -102,8 +102,8 @@ export const experience: Experience[] = [
 ];
 
 export const education = [
-  { school: 'National University â€“ DasmariÃ±as', program: 'Bachelor of Science in Information Technology', detail: 'Specialization in Mobile and Web Applications', period: '2023â€“Present' },
-  { school: 'Philippine Christian University â€“ DasmariÃ±as', program: 'Senior High School Â· STEM Strand', detail: 'Graduated with Honors', period: '2022â€“2023' },
+  { school: 'National University – Dasmariñas', program: 'Bachelor of Science in Information Technology', detail: 'Specialization in Mobile and Web Applications', period: '2023–Present' },
+  { school: 'Philippine Christian University – Dasmariñas', program: 'Senior High School · STEM Strand', detail: 'Graduated with Honors', period: '2022–2023' },
 ] as const;
 
 export type Credential = { name: string; organization?: string; organizer?: string; date?: string; preview?: string; file?: string; verification?: string; fileLabel?: string };
@@ -131,28 +131,28 @@ export const certifications: Credential[] = [
 
 export const seminars: Credential[] = [
   {
-    "name": "Beyond Spreadsheets: Visualizing Dataâ€™s Story Through Analytics",
-    "organizer": "NU DasmariÃ±as Computer Society",
+    "name": "Beyond Spreadsheets: Visualizing Data’s Story Through Analytics",
+    "organizer": "NU Dasmariñas Computer Society",
     "date": "May 7, 2025",
     "preview": "/certificates/data-analytics.jpg",
     "file": "/certificates/data-analytics.pdf"
   },
   {
     "name": "From Code to Deployment: Streamlining Software Development with Microsoft Azure DevOps",
-    "organizer": "NU DasmariÃ±as Computer Society",
+    "organizer": "NU Dasmariñas Computer Society",
     "date": "April 23, 2025",
     "preview": "/certificates/azure-devops.jpg",
     "file": "/certificates/azure-devops.pdf"
   },
   {
     "name": "Modern Web + AI (UI/UX)",
-    "organizer": "NU DasmariÃ±as Computer Society",
+    "organizer": "NU Dasmariñas Computer Society",
     "date": "April 23, 2025",
     "preview": "/certificates/modern-web-ai.jpg",
     "file": "/certificates/modern-web-ai.pdf"
   },
   {
-    "name": "Exploring the Tech World: Cloud Computingâ€™s Role in Construction Management",
+    "name": "Exploring the Tech World: Cloud Computing’s Role in Construction Management",
     "organizer": "INF234",
     "date": "February 24, 2025",
     "preview": "/certificates/exploring-tech.jpg",
