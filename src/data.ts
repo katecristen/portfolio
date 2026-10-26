@@ -2,19 +2,15 @@ export type Project = { title: string; subtitle?: string; role: string; stack: s
 export type Experience = { year: string; title: string; organization: string; details: string[] };
 
 export const navLinks = [
-  { label: 'Home', href: '#hero' },
   { label: 'About', href: '#about' },
-  { label: 'Skills', href: '#tech-stack' },
   { label: 'Projects', href: '#projects' },
-  { label: 'Leadership', href: '#experience' },
-  { label: 'Education', href: '#education' },
-  { label: 'Certifications', href: '#certifications' },
-  { label: 'Trainings & Seminars', href: '#seminars' },
+  { label: 'Skills', href: '#skills' },
+  { label: 'Credentials', href: '#credentials' },
   { label: 'Contact', href: '#contact' },
 ] as const;
 
 export const highlights = [
-  { value: '06', label: 'Software projects' },
+  { value: '04', label: 'Software projects' },
   { value: '03', label: 'Organization roles' },
   { value: '02', label: 'Certiport credentials' },
 ] as const;
@@ -23,8 +19,8 @@ export const techStacks = [
   { category: 'Frontend', items: ['React.js', 'Vue.js', 'Next.js', 'Tailwind CSS', 'HTML', 'CSS', 'JavaScript', 'TypeScript'] },
   { category: 'Backend', items: ['Node.js', 'Express.js', 'Supabase', 'Firebase'] },
   { category: 'Mobile', items: ['Flutter', 'Dart', 'Android Studio'] },
-  { category: 'Database & local development', items: ['PostgreSQL', 'MySQL', 'Oracle', 'MongoDB', 'XAMPP'] },
-  { category: 'Tools', items: ['Git', 'GitHub', 'Figma', 'VS Code', 'Vercel', 'Adobe Photoshop', 'Canva'] },
+  { category: 'Database & local development', items: ['PostgreSQL', 'MySQL', 'Oracle', 'MongoDB'] },
+  { category: 'Tools', items: ['Git', 'GitHub', 'Figma', 'VS Code', 'Vercel', 'XAMPP', 'Adobe Photoshop', 'Canva'] },
   { category: 'Basic programming', items: ['Java', 'Python'] },
 ] as const;
 
@@ -33,7 +29,7 @@ export const projects: Project[] = [
     title: 'OSCAFlow',
     subtitle: 'An OCR-Assisted Mobile and Intelligent Web System for CSWDO-OSCA Operations',
     role: 'Capstone Project · Project Manager & Developer',
-    stack: ['Flutter', 'Vue.js', 'XAMPP'],
+    stack: ['Flutter', 'Vue.js'],
     details: [
       'Managed project planning, task assignments, development progress, and team coordination.',
       'Contributed to mobile and web application features based on project requirements.',
@@ -108,7 +104,7 @@ export const education = [
 
 export type Credential = { name: string; organization?: string; organizer?: string; date?: string; preview?: string; file?: string; verification?: string; fileLabel?: string };
 
-export const portrait: { src?: string; alt: string } = { src: '/kate-cristen-santos.jpg', alt: "Portrait of Kate Cristen Santos" };
+export const portrait: { src?: string; alt: string } = { src: '/kate-portrait-removebg-preview.png', alt: "Portrait of Kate Cristen Santos" };
 
 export const certifications: Credential[] = [
   {
@@ -184,8 +180,8 @@ export const seminars: Credential[] = [
 export const socials = [
   { label: 'GitHub', href: 'https://github.com/katecristen' },
   { label: 'LinkedIn', href: 'https://www.linkedin.com/in/kate-cristen-santos-2927b8341/' },
-  { label: 'Email', href: 'mailto:hello@katecristensantos.com' },
+  { label: 'Email', href: 'mailto:keytcristen26@gmail.com' },
 ] as const;
 
-export const heroIntro = 'I build web and mobile applications, connect the backend systems behind them, and lead teams from the first requirements to the final implementation. A BSIT student with hands-on experience making software and projects work.';
-export const aboutCopy = 'I develop web and mobile applications, coordinate project tasks, and work with teams from system design through implementation. My academic and organizational projects have given me practical experience with frontend and backend technologies, databases, development tools, and UI/UX design.';
+export const heroIntro = 'I build mobile and web applications, connect the backend systems behind them, and lead teams from the first requirements to the final implementation. A BSIT student with hands-on experience making software and projects work.';
+export const aboutCopy = 'I develop mobile and web applications, coordinate project tasks, and work with teams from system design through implementation. My academic and organizational projects have given me practical experience with frontend and backend technologies, databases, development tools, and UI/UX design.';
