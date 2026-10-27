@@ -216,6 +216,7 @@ body,.site-shell,.site-header,.nav-links,.content-section,.skills-section,.conta
 .contact-form input:focus,.contact-form textarea:focus{border-color:var(--rose-deep)}
 .contact-form-action button{border-color:rgb(var(--accent));background:rgb(var(--accent));color:rgb(var(--on-accent))}
 .contact-form-action button:hover{background:rgb(var(--accent-secondary))}
+.contact-fallback-link{display:inline-flex;align-items:center;gap:6px;margin-top:8px;color:var(--rose-deep);font-size:12px;text-decoration:underline;text-underline-offset:3px}
 .contact-form-heading .micro-label{color:var(--rose-deep)}
 @media(prefers-reduced-motion:reduce){body,.site-shell,.site-header,.nav-links,.content-section,.skills-section,.contact-section,.site-footer,.theme-button{transition:none}}
 @media(min-width:1201px){.hero h1{font-size:clamp(64px,5.1vw,82px)}}

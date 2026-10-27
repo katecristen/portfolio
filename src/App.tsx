@@ -197,6 +197,7 @@ function App() {
   const [form, setForm] = useState<FormState>(initialForm);
   const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
   const [errorMessage, setErrorMessage] = useState('');
+  const emailDraftHref = `mailto:keytcristen26@gmail.com?subject=${encodeURIComponent(`Portfolio inquiry from ${form.name.trim()}`)}&body=${encodeURIComponent(`Name: ${form.name.trim()}\nEmail: ${form.email.trim()}\n\n${form.message.trim()}`)}`;
   const handleChange = (field: keyof FormState) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm(current => ({ ...current, [field]: event.target.value }));
     setStatus('idle');
@@ -288,7 +289,7 @@ function App() {
     <label><span>Email</span><input name="email" type="email" value={form.email} onChange={handleChange('email')} placeholder="Your email" autoComplete="email" required maxLength={254} /></label>
   </div>
   <label className="contact-message"><span>Message</span><textarea name="message" value={form.message} onChange={handleChange('message')} placeholder="Tell me about your project or collaboration idea" required maxLength={5000} /></label>
-  <div className="contact-form-action"><button type="submit" disabled={status === 'sending'}>{status === 'sending' ? 'Sending…' : 'Send message'} <ArrowUpRight size={18} aria-hidden="true"/></button><p role={status === 'error' ? 'alert' : 'status'} aria-live="polite">{status === 'sending' ? 'Sending your message…' : status === 'sent' ? 'Message sent successfully.' : status === 'error' ? errorMessage : ''}</p></div>
+  <div className="contact-form-action"><button type="submit" disabled={status === 'sending'}>{status === 'sending' ? 'Sending…' : 'Send message'} <ArrowUpRight size={18} aria-hidden="true"/></button><div><p role={status === 'error' ? 'alert' : 'status'} aria-live="polite">{status === 'sending' ? 'Sending your message…' : status === 'sent' ? 'Message sent successfully.' : status === 'error' ? errorMessage : ''}</p>{status === 'error' && <a className="contact-fallback-link" href={emailDraftHref}>Open a prefilled email draft <ArrowUpRight size={14} aria-hidden="true"/></a>}</div></div>
 </form><div className="contact-bottom"><div><span className="micro-label">SOCIAL LINKS</span><div className="social-links"><a href={socials[0].href} target="_blank" rel="noreferrer"><Github size={18}/> GitHub <ArrowUpRight size={14}/></a><a href={socials[1].href} target="_blank" rel="noreferrer"><Linkedin size={18}/> LinkedIn <ArrowUpRight size={14}/></a><a href={socials[2].href}><Mail size={18}/> Email <ArrowUpRight size={14}/></a></div></div><div className="collab-note"><span className="micro-label">OPEN TO COLLABORATION</span><p>I enjoy working with teams on mobile and web applications, from planning through implementation.</p></div></div></Reveal></div></section>
   </main><footer className="site-footer"><div className="section-wrap"><span>© 2026 KATE CRISTEN SANTOS</span><button type="button" className="return-intro" onClick={returnToIntro}>Return to intro <ArrowUpRight size={13} aria-hidden="true"/></button></div></footer></div>}{selectedProject !== null && <ProjectCaseStudy index={selectedProject} onChange={setSelectedProject} onClose={() => setSelectedProject(null)}/>}</>;
 }
