@@ -1,9 +1,16 @@
-import { useEffect, useId, useMemo, useRef, useState } from 'react';
-import { motion, useScroll } from 'framer-motion';
+import { useEffect, useId, useRef, useState } from 'react';
+import { motion, useScroll, useReducedMotion } from 'framer-motion';
 import { ArrowRight, ArrowUpRight, Github, Linkedin, Mail, Moon, Sun } from 'lucide-react';
 import { aboutCopy, certifications, education, experience, highlights, heroIntro, navLinks, projects, portrait, seminars, socials, techStacks } from './data';
 import type { Credential } from './data';
 import { MagneticButton, Reveal } from './components';
+
+const introMoods = [
+  { emoji: '\u{1F642}', label: 'Curious', response: 'Curious. I like that.' },
+  { emoji: '\u{1F60E}', label: 'Exploring', response: 'Nice. Let\u2019s explore.' },
+  { emoji: '\u{1F929}', label: 'Excited', response: 'Love the energy.' },
+  { emoji: '\u{1F9D1}\u200D\u{1F4BB}', label: 'Ready', response: 'Let\u2019s build something.' },
+] as const;
 
 const featuredSkills = ['React.js', 'Flutter', 'TypeScript', 'Vue.js', 'Figma', 'Node.js', 'PostgreSQL', 'Tailwind CSS'];
 type FormState = { name: string; email: string; message: string };
@@ -18,7 +25,7 @@ function BrowserPreview({ kind = 0 }: { kind?: number }) {
 }
 function Portrait() {
   const [failed, setFailed] = useState(false);
-  return <figure className="portrait-editorial"><div className="portrait-topline"><span>DEVELOPER & PROJECT LEADER</span></div><div className="portrait-frame">{portrait.src && !failed ? <img src={portrait.src} alt={portrait.alt} onError={() => setFailed(true)} /> : <div className="portrait-fallback"><span className="portrait-initials" aria-hidden="true">ks<span>.</span></span><p>Kate Cristen Santos</p><span className="portrait-note">PERSONAL PORTRAIT FORTHCOMING</span></div>}<span className="portrait-side" aria-hidden="true">THOUGHTFUL CODE. SHARED DIRECTION.</span></div><figcaption><span>BASED IN THE PHILIPPINES</span></figcaption></figure>;
+  return <figure className="portrait-editorial"><div className="portrait-frame">{portrait.src && !failed ? <img src={portrait.src} alt={portrait.alt} onError={() => setFailed(true)} /> : <div className="portrait-fallback"><span className="portrait-initials" aria-hidden="true">ks<span>.</span></span><p>Kate Cristen Santos</p><span className="portrait-note">PERSONAL PORTRAIT FORTHCOMING</span></div>}<span className="portrait-side" aria-hidden="true">THOUGHTFUL CODE. SHARED DIRECTION.</span></div><figcaption><span>BASED IN THE PHILIPPINES</span></figcaption></figure>;
 }
 function CredentialEntry({ entry, index, popup = false }: { entry: Credential; index: number; popup?: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null);
@@ -36,11 +43,109 @@ function CredentialEntry({ entry, index, popup = false }: { entry: Credential; i
   const preview = <>{entry.preview && !failed ? <img src={entry.preview} alt={`${entry.fileLabel ? "Exam score report" : "Certificate"}: ${entry.name}`} loading="lazy" onError={() => setFailed(true)} /> : <div className="certificate-unavailable"><span>DOCUMENT {String(index + 1).padStart(2, '0')}</span><span>{entry.file ? 'Open certificate' : 'Certificate preview unavailable'}</span></div>}</>;
   return <article className="credential-entry">{popup && entry.preview && !failed ? <button type="button" className="certificate-preview" onClick={() => setOpen(true)} aria-label={`Enlarge certificate for ${entry.name}`} aria-haspopup="dialog">{preview}<ArrowUpRight size={18}/></button> : entry.file ? <a className="certificate-preview" href={entry.file} target="_blank" rel="noopener noreferrer" aria-label={`Open certificate for ${entry.name}`}>{preview}<ArrowUpRight size={18}/></a> : entry.preview && !failed ? <a className="certificate-preview" href={entry.preview} target="_blank" rel="noopener noreferrer" aria-label={`Enlarge certificate for ${entry.name}`}>{preview}<ArrowUpRight size={18}/></a> : <div className="certificate-preview">{preview}</div>}<div className="credential-copy"><span className="micro-label">{String(index + 1).padStart(2, '0')} / {entry.date || 'DATE NOT PROVIDED'}</span><h3>{entry.name}</h3><p>{entry.organization || entry.organizer}</p>{popup && entry.preview && !failed ? <button type="button" className="certificate-link" onClick={() => setOpen(true)} aria-haspopup="dialog">View certificate <ArrowUpRight size={14}/></button> : entry.file && <a className="certificate-link" href={entry.file} target="_blank" rel="noopener noreferrer">{entry.fileLabel || "View certificate"} <ArrowUpRight size={14}/></a>}{entry.verification && <a className="certificate-link credential-verification" href={entry.verification} target="_blank" rel="noopener noreferrer">Verify on Credly <ArrowUpRight size={14}/></a>}</div>{popup && open && <dialog ref={dialog} className="certificate-dialog" aria-labelledby={titleId} onCancel={closePreview} onClose={() => setOpen(false)} onClick={event => { if (event.target === event.currentTarget) { const bounds = event.currentTarget.getBoundingClientRect(); if (event.clientX < bounds.left || event.clientX > bounds.right || event.clientY < bounds.top || event.clientY > bounds.bottom) closePreview(); } }}><div className="certificate-dialog-header"><h2 id={titleId}>{entry.name}</h2><button type="button" onClick={closePreview} autoFocus aria-label="Close certificate preview">Close <span aria-hidden="true">&times;</span></button></div><img src={entry.preview} alt={`Certificate: ${entry.name}`} /><p>{entry.organizer || entry.organization}{entry.date && ` · ${entry.date}`}</p></dialog>}</article>;
 }
-function ProjectFeature({ project, index }: { project: typeof projects[number]; index: number }) {
-  const label = index === 0 ? 'OPERATIONS / MOBILE + WEB' : index === 1 ? 'APPOINTMENTS / TRACKING' : index === 2 ? 'E-COMMERCE / RENTALS' : 'RESERVATION / MANAGEMENT SYSTEM';
-      return <Reveal><article className={`project-feature ${index % 2 ? 'reverse' : ''}`}><div className="project-copy"><div className="project-kicker"><span>{String(index+1).padStart(2, '0')}</span><span>FEATURED PROJECT</span></div><h3>{project.title}</h3>{project.subtitle && <p className="project-subtitle">{project.subtitle}</p>}<p className="project-role">{project.role}</p><ul>{project.details.map(detail=><li key={detail}>{detail}</li>)}</ul><div className="project-tags">{project.stack.map(item=><span key={item}>{item}</span>)}</div>{project.liveDemo && <MagneticButton href={project.liveDemo} target="_blank" rel="noopener noreferrer" className="editorial-button project-demo" icon={<ArrowUpRight size={17} aria-hidden="true"/>}>View Live Demo</MagneticButton>}</div><div className={`project-visual ${project.images ? 'project-visual-images' : ''}`}><span className="visual-label">{label}</span>{project.images ? <div className={`project-gallery ${project.title === 'OSCAFlow' ? 'oscaflow-gallery' : ''}`}>{project.images.map((image, imageIndex)=><figure key={image.src} className={`project-shot ${project.title === 'OSCAFlow' ? `oscaflow-shot osca-shot-${imageIndex + 1}` : ''}`}><img src={image.src} alt={image.alt} loading="lazy"/></figure>)}</div> : <BrowserPreview kind={index}/>}<div className="visual-index">{String(index+1).padStart(2, '0')}<span>/ {String(projects.length).padStart(2, '0')}</span></div></div></article></Reveal>;
+function ProjectFeature({ project, onOpen }: { project: typeof projects[number]; onOpen: () => void }) {
+  return <Reveal><article className="project-card">
+    <button type="button" className="project-image-button" onClick={onOpen} aria-label={`View ${project.title} case study`} aria-haspopup="dialog">
+      <img className="project-card-image" src={project.images[0].src} alt={project.images[0].alt} loading="lazy" />
+    </button>
+    <div className="project-card-copy">
+      <p className="project-card-category">{project.subtitle}</p>
+      <h3>{project.title}</h3>
+      <p className="project-card-role"><span>MY ROLE</span>{project.role}</p>
+      <div className="project-tags">{project.stack.map(item => <span key={item}>{item}</span>)}</div>
+      <button type="button" className="project-view-link" onClick={onOpen} aria-haspopup="dialog">View Project <ArrowRight size={16} aria-hidden="true"/></button>
+    </div>
+  </article></Reveal>;
+}
+function ProjectCaseStudy({ index, onChange, onClose }: { index: number; onChange: (index: number) => void; onClose: () => void }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const videoDialog = useRef<HTMLDialogElement>(null);
+  const videoPlayer = useRef<HTMLVideoElement>(null);
+  const titleId = useId();
+  const videoTitleId = useId();
+  const [activeImage, setActiveImage] = useState(0);
+  const project = projects[index];
+  useEffect(() => {
+    const opener = document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    const scrollY = window.scrollY;
+    const body = document.body;
+    const root = document.documentElement;
+    const previous = { position: body.style.position, top: body.style.top, width: body.style.width, overflow: body.style.overflow, paddingRight: body.style.paddingRight, rootOverflow: root.style.overflow, scrollBehavior: root.style.scrollBehavior };
+    const scrollbarWidth = window.innerWidth - root.clientWidth;
+    body.style.paddingRight = `${parseFloat(getComputedStyle(body).paddingRight) + scrollbarWidth}px`;
+    body.style.position = 'fixed';
+    body.style.top = `-${scrollY}px`;
+    body.style.width = '100%';
+    body.style.overflow = 'hidden';
+    root.style.overflow = 'hidden';
+    dialog.current?.showModal();
+    return () => {
+      Object.assign(body.style, { position: previous.position, top: previous.top, width: previous.width, overflow: previous.overflow, paddingRight: previous.paddingRight });
+      root.style.overflow = previous.rootOverflow;
+      root.style.scrollBehavior = 'auto';
+      window.scrollTo({ top: scrollY, behavior: 'instant' });
+      root.style.scrollBehavior = previous.scrollBehavior;
+      opener?.focus({ preventScroll: true });
+    };
+  }, []);
+  useEffect(() => {
+    setActiveImage(0);
+    dialog.current?.scrollTo({ top: 0, behavior: 'instant' });
+  }, [index]);
+  const close = () => { dialog.current?.close(); onClose(); };
+  return <dialog ref={dialog} className="project-dialog" aria-labelledby={titleId} onCancel={event => { event.preventDefault(); close(); }} onClose={onClose}>
+    <div className="project-dialog-header"><span className="micro-label">CASE STUDY / {String(index + 1).padStart(2, '0')}</span><button type="button" onClick={close} autoFocus aria-label="Close project details">Close <span aria-hidden="true">&times;</span></button></div>
+    <div className="project-dialog-content">
+      <div className={`project-dialog-gallery${project.images.length > 1 ? ' has-multiple' : ''}`}>
+        {project.images.map((image, imageIndex) => <img key={image.src} className={imageIndex === activeImage ? 'is-active' : ''} src={image.src} alt={image.alt} />)}
+      </div>
+
+      {project.images.length > 1 && <div className="project-preview-controls" role="group" aria-label="Choose project preview">{project.images.map((image, imageIndex) => <button key={image.src} type="button" aria-label={`Show ${image.alt}`} aria-pressed={imageIndex === activeImage} onClick={() => setActiveImage(imageIndex)}>Preview {String(imageIndex + 1).padStart(2, '0')}</button>)}</div>}
+      <div className="project-case-heading"><div><p className="project-card-category">{project.subtitle}</p><h2 id={titleId}>{project.title}</h2></div>{project.liveDemo ? <a className="editorial-button project-live-link" href={project.liveDemo} target="_blank" rel="noopener noreferrer">View Live Project <ArrowUpRight size={16} aria-hidden="true"/></a> : project.video && <button type="button" className="editorial-button project-live-link" onClick={() => videoDialog.current?.showModal()} aria-haspopup="dialog">View Project Walkthrough <ArrowUpRight size={16} aria-hidden="true"/></button>}</div>
+      <div className="project-case-grid">
+        <div className="project-case-column"><section><h3 className="micro-label">PROJECT OVERVIEW</h3><p>{project.details[0]}</p></section><section><h3 className="micro-label">TECH STACK</h3><div className="project-tags">{project.stack.map(item => <span key={item}>{item}</span>)}</div></section></div>
+        <div className="project-case-column"><section><h3 className="micro-label">MY ROLE</h3><p className="project-role">{project.role}</p></section><section><h3 className="micro-label">PROJECT DETAILS</h3><p>{project.details.slice(1).join(' ')}</p></section></div>
+      </div>
+      <nav className="project-case-navigation" aria-label="Project navigation"><button type="button" onClick={() => onChange((index - 1 + projects.length) % projects.length)}><span aria-hidden="true">&larr;</span> Previous Project</button><span className="micro-label">{String(index + 1).padStart(2, '0')} / {String(projects.length).padStart(2, '0')}</span><button type="button" onClick={() => onChange((index + 1) % projects.length)}>Next Project <span aria-hidden="true">&rarr;</span></button></nav>
+    </div>
+  {project.video && <dialog ref={videoDialog} className="project-video-dialog" aria-labelledby={videoTitleId} onClose={() => videoPlayer.current?.pause()}>
+    <div className="project-video-dialog-header"><h2 id={videoTitleId}>{project.title} walkthrough</h2><button type="button" onClick={() => videoDialog.current?.close()}>Close <span aria-hidden="true">&times;</span></button></div>
+    <video ref={videoPlayer} controls autoPlay playsInline aria-label={`${project.title} project walkthrough`}><source src={project.video} type="video/mp4" />Your browser does not support the video element.</video>
+  </dialog>}  </dialog>;
 }
 function App() {
+  const [selectedProject, setSelectedProject] = useState<number | null>(null);
+  const [introStage, setIntroStage] = useState<'intro' | 'leaving' | 'portfolio'>('intro');
+  const prefersReducedMotion = useReducedMotion();
+  const [selectedMood, setSelectedMood] = useState<number | null>(null);
+  const exploreTrack = useRef<HTMLSpanElement>(null);
+  const selectionStarted = useRef(false);
+  const [dividerOrigin, setDividerOrigin] = useState({ left: 0, top: 0, width: 0 });
+  useEffect(() => {
+    if (introStage !== 'intro' || selectedMood === null) return;
+    const timer = window.setTimeout(() => {
+      const bounds = exploreTrack.current?.getBoundingClientRect();
+      if (bounds) setDividerOrigin({ left: bounds.left, top: bounds.top + bounds.height / 2, width: bounds.width });
+      setIntroStage('leaving');
+    }, 1100);
+    return () => window.clearTimeout(timer);
+  }, [introStage, selectedMood]);
+  useEffect(() => {
+    if (introStage !== 'leaving') return;
+    const timer = window.setTimeout(() => setIntroStage('portfolio'), prefersReducedMotion ? 50 : 1300);
+    return () => window.clearTimeout(timer);
+  }, [introStage, prefersReducedMotion]);
+  useEffect(() => {
+    if (introStage === 'portfolio') return;
+    const previousOverflow = document.body.style.overflow;
+    document.body.style.overflow = 'hidden';
+    return () => { document.body.style.overflow = previousOverflow; };
+  }, [introStage]);
+  const selectMood = (index: number) => {
+    if (introStage !== 'intro' || selectionStarted.current) return;
+    selectionStarted.current = true;
+    setSelectedMood(index);
+  };
   const [theme, setTheme] = useState<'light' | 'dark'>(() => document.documentElement.dataset.theme === 'dark' ? 'dark' : 'light');
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeSection, setActiveSection] = useState('#hero');
@@ -90,20 +195,38 @@ function App() {
     return () => { document.removeEventListener('keydown', keydown); document.removeEventListener('pointerdown', outside); };
   }, [menuOpen]);
   const [form, setForm] = useState<FormState>(initialForm);
-  const [status, setStatus] = useState<'idle' | 'sent'>('idle');
-  const mailtoHref = useMemo(() => {
-    const subject = encodeURIComponent(`Portfolio inquiry from ${form.name || 'a visitor'}`);
-    const body = encodeURIComponent(`Name: ${form.name}\nEmail: ${form.email}\n\n${form.message}`);
-    return `mailto:hello@katecristensantos.com?subject=${subject}&body=${body}`;
-  }, [form.email, form.message, form.name]);
+  const [status, setStatus] = useState<'idle' | 'sending' | 'sent' | 'error'>('idle');
+  const [errorMessage, setErrorMessage] = useState('');
   const handleChange = (field: keyof FormState) => (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setForm(current => ({ ...current, [field]: event.target.value }));
     setStatus('idle');
+    setErrorMessage('');
   };
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    window.location.href = mailtoHref;
-    setStatus('sent');
+    if (status === 'sending') return;
+    setStatus('sending');
+    try {
+      const response = await fetch('/api/contact', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (!response.ok) {
+        const result = await response.json().catch(() => null);
+        const fallback = response.status === 404
+          ? 'The contact endpoint is unavailable. Run the site through Vercel so its API function can handle submissions.'
+          : `The contact service returned an error (${response.status}). Please try again later.`;
+        throw new Error(result?.error || fallback);
+      }
+      setStatus('sent');
+      setForm(initialForm);
+    } catch (error) {
+      setStatus('error');
+      setErrorMessage(error instanceof TypeError
+        ? 'Could not reach the contact service. Check your connection and try again.'
+        : error instanceof Error ? error.message : 'Unable to send your message. Please try again.');
+    }
   };
   const toggleTheme = () => {
     const nextTheme = theme === 'dark' ? 'light' : 'dark';
@@ -111,24 +234,62 @@ function App() {
     document.documentElement.dataset.theme = nextTheme;
     try { localStorage.setItem('portfolio-theme', nextTheme); } catch { /* Theme remains active for this page view. */ }
     const themeColor = document.querySelector<HTMLMetaElement>('meta[name="theme-color"]');
-    if (themeColor) themeColor.content = nextTheme === 'dark' ? '#181616' : '#FAF8F6';
+    if (themeColor) themeColor.content = nextTheme === 'dark' ? '#181616' : '#FFFFFF';
   };
   const { scrollYProgress } = useScroll();
-  return <div className="site-shell"><a className="skip-link" href="#main">Skip to content</a><motion.div className="reading-progress" style={{scaleX:scrollYProgress}}/><div className={`custom-cursor${cursor.visible ? ' is-visible' : ''}${cursor.button ? ' is-button' : ''}${cursor.project ? ' is-project' : ''}`} style={{left:cursor.x,top:cursor.y}} aria-hidden="true">{cursor.project ? 'VIEW' : ''}</div><header className={`site-header${scrolled ? ' is-scrolled' : ''}`}><div className="header-inner"><a className="brand" href="#hero" onClick={event => navigate(event, "#hero")} aria-label="Kate Cristen Santos, back to top"><img className="brand-logo" src="/portfolio-logo.png" alt=""/></a><nav id="primary-navigation" ref={nav} className={menuOpen?'nav-links open':'nav-links'} aria-label="Primary">{navLinks.map(link=><a key={link.href} href={link.href} onClick={event=>navigate(event, link.href)} aria-current={activeSection === link.href ? "location" : undefined}>{link.label}</a>)}</nav><div className="header-actions"><button className="theme-button" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`} aria-pressed={theme === 'dark'} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>{theme === 'dark' ? <Sun size={17} aria-hidden="true"/> : <Moon size={17} aria-hidden="true"/>}</button><button ref={menuButton} aria-controls="primary-navigation" className="menu-button" type="button" onClick={()=>setMenuOpen(!menuOpen)} aria-label="Toggle navigation" aria-expanded={menuOpen}>{menuOpen?'CLOSE':'MENU'}</button></div></div></header><main id="main">
-    <section id="hero" tabIndex={-1} className="hero section-wrap"><div className="hero-intro"><span className="eyebrow"><span className="eyebrow-line"/> A PERSONAL INTRODUCTION</span><h1>Kate Cristen Santos</h1><p className="hero-role">IT Student | Mobile and Web Developer &amp; Project Leader</p><h2 className="hero-headline">I build the software.<br/><em>And bring the team along.</em></h2><p className="hero-description">{heroIntro}</p><div className="hero-actions"><MagneticButton href="#contact" className="editorial-button" icon={<ArrowUpRight size={17}/>}>Let's work together</MagneticButton><a className="hero-email" href={socials[2].href}>Email me <ArrowRight size={16}/></a></div><a className="resume-link" href="/resume.pdf" target="_blank" rel="noopener noreferrer">View / download resume <ArrowUpRight size={15} aria-hidden="true"/></a></div><div className="hero-visual"><Portrait/></div></section>
-    <section id="about" tabIndex={-1} className="section-wrap content-section about-section"><div className="ambient-word" aria-hidden="true">ABOUT</div><Reveal><SectionTitle number="01" eyebrow="ABOUT ME" title={'Curious by nature.\nIntentional by design.'} description={aboutCopy}/></Reveal><div className="about-grid"><Reveal><div className="about-statement"><p>I am a BSIT student specializing in Mobile and Web Applications. Through academic and organizational projects, I have developed practical experience in web and mobile development, project management, and technical leadership.</p><p>I collaborate with software teams, manage project tasks, and contribute to system design, testing, and implementation.</p></div></Reveal><Reveal delay={0.08}><div className="about-aside"><span className="micro-label">WHAT I BRING TO THE TABLE</span><div className="about-list">{['Mobile applications','Web applications','Project coordination','UI/UX design'].map((item,i)=><div key={item}><span>0{i+1}</span><strong>{item}</strong><ArrowUpRight size={16}/></div>)}</div><p>I work with frontend and backend technologies, databases, and development tools to turn project requirements into working features.</p><p>Hands-on experience building academic applications with modern tools. Planning tasks, supporting development, and coordinating team progress.</p></div></Reveal></div><div className="metrics-strip">{highlights.map(item=><div key={item.label}><strong>{item.value}</strong><span>{item.label}</span></div>)}</div><div className="about-leadership"><Reveal><div><span className="micro-label">LEADERSHIP EXPERIENCE</span><h3>Leading the work behind the work.</h3><p>Organization roles built on planning, clear communication, and steady team coordination.</p></div></Reveal><div className="timeline">{experience.map((entry,index)=><Reveal key={`${entry.year}-${entry.title}`} delay={index*.05}><article className="timeline-entry"><span>{entry.year}</span><div><h3>{entry.title}</h3><p className="timeline-org">{entry.organization}</p><ul>{entry.details.map(detail=><li key={detail}>{detail}</li>)}</ul></div></article></Reveal>)}</div></div></section>
-    <section id="projects" tabIndex={-1} className="section-wrap content-section projects-section"><div className="ambient-word" aria-hidden="true">PROJECTS</div><Reveal><SectionTitle number="02" eyebrow="ACADEMIC & PERSONAL PROJECTS" title={'From ideas to working systems.'} description="Capstone, academic, and personal applications built across web, mobile, and backend technologies."/></Reveal><div className="projects-list">{projects.map((project,index)=><ProjectFeature key={project.title} project={project} index={index}/>)}</div></section>
+  const returnToIntro = () => {
+    setMenuOpen(false);
+    selectionStarted.current = false;
+    setSelectedMood(null);
+    window.scrollTo({ top: 0, behavior: 'instant' });
+    setIntroStage('intro');
+  };
+  useEffect(() => {
+    if (introStage === 'leaving') return;
+    const frame = requestAnimationFrame(() => {
+      if (introStage === 'portfolio') {
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        document.getElementById('hero')?.focus({ preventScroll: true });
+      } else document.getElementById('intro-title')?.focus({ preventScroll: true });
+    });
+    return () => cancelAnimationFrame(frame);
+  }, [introStage]);
+  const intro = introStage !== 'portfolio' && <div className={`intro-shell${introStage === 'leaving' ? ' is-leaving' : ''}`} ref={element => { if (element) element.inert = introStage === 'leaving'; }} data-theme={theme} aria-hidden={introStage === 'leaving' || undefined}>
+      <header className="intro-header">
+        <div className="intro-index"><span>KATE CRISTEN SANTOS</span><span>PORTFOLIO / 2026</span></div>
+        <div className="intro-controls" aria-label="Introduction controls">
+          <button className="intro-theme" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`} aria-pressed={theme === 'dark'} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>{theme === 'dark' ? <Sun size={14} aria-hidden="true"/> : <Moon size={14} aria-hidden="true"/>}<span>{theme === 'dark' ? 'Light' : 'Dark'} mode</span></button>
+          <button className="intro-skip" type="button" onClick={() => setIntroStage('portfolio')}>Skip intro <ArrowRight size={14} aria-hidden="true"/></button>
+        </div>
+      </header>
+      <main className="intro-explore-content" aria-labelledby="intro-title">
+        <h1 id="intro-title" className="intro-explore-heading" tabIndex={-1}>HOW ARE YOU FEELING?</h1>
+        <p className="intro-explore-prompt">Choose a mood before you explore.</p>
+        <div className={`intro-mood-choices${selectedMood !== null ? ' has-selection' : ''}`} role="group" aria-labelledby="intro-title">
+          {introMoods.map((mood, index) => <button key={mood.label} type="button" className={`intro-mood${selectedMood === index ? ' is-selected' : ''}`} onClick={() => selectMood(index)} aria-label={`${mood.label}: enter portfolio`} aria-pressed={selectedMood === index} aria-disabled={selectedMood !== null}>
+            <span className="intro-mood-emoji" aria-hidden="true">{mood.emoji}</span>
+            <span className="intro-mood-label">{mood.label}</span>
+          </button>)}
+          <span className="intro-explore-track" ref={exploreTrack} aria-hidden="true"/>
+        </div>
+        <p className="intro-explore-hint" role="status" aria-live="polite" aria-atomic="true">{selectedMood !== null ? introMoods[selectedMood].response : '\u00a0'}</p>
+      </main>
+    </div>;
+  return <>{intro}{introStage === 'leaving' && <motion.div className="intro-divider-bridge" aria-hidden="true" initial={{ left: dividerOrigin.left, top: dividerOrigin.top, width: dividerOrigin.width }} animate={{ left: 0, width: '100%', top: window.innerWidth <= 900 ? 64 : 72 }} transition={{ duration: prefersReducedMotion ? 0 : .85, ease: [.65, 0, .2, 1] }}/>} {introStage !== 'intro' && <div className={`site-shell portfolio-reveal${introStage === 'leaving' ? ' is-revealing' : ''}`} ref={element => { if (element) element.inert = introStage === 'leaving'; }} aria-hidden={introStage === 'leaving' || undefined}><a className="skip-link" href="#main">Skip to content</a><motion.div className="reading-progress" style={{scaleX:scrollYProgress}}/><div className={`custom-cursor${cursor.visible ? ' is-visible' : ''}${cursor.button ? ' is-button' : ''}${cursor.project ? ' is-project' : ''}`} style={{left:cursor.x,top:cursor.y}} aria-hidden="true">{cursor.project ? 'VIEW' : ''}</div><header className={`site-header${scrolled ? ' is-scrolled' : ''}`}><div className="header-inner"><a className="brand" href="#hero" onClick={event => navigate(event, "#hero")} aria-label="Kate Cristen Santos, back to top"><img className="brand-logo" src="/portfolio-logo.png" alt=""/></a><nav id="primary-navigation" ref={nav} className={menuOpen?'nav-links open':'nav-links'} aria-label="Primary">{navLinks.map(link=><a key={link.href} href={link.href} onClick={event=>navigate(event, link.href)} aria-current={activeSection === link.href ? "location" : undefined}>{link.label}</a>)}</nav><div className="header-actions"><button className="return-intro header-intro-link" type="button" onClick={returnToIntro} aria-label="Return to introduction">Intro</button><button className="theme-button" type="button" onClick={toggleTheme} aria-label={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`} aria-pressed={theme === 'dark'} title={`Switch to ${theme === 'dark' ? 'light' : 'dark'} mode`}>{theme === 'dark' ? <Sun size={17} aria-hidden="true"/> : <Moon size={17} aria-hidden="true"/>}</button><button ref={menuButton} aria-controls="primary-navigation" className="menu-button" type="button" onClick={()=>setMenuOpen(!menuOpen)} aria-label="Toggle navigation" aria-expanded={menuOpen}>{menuOpen?'CLOSE':'MENU'}</button></div></div></header><main id="main">
+    <section id="hero" tabIndex={-1} className="hero section-wrap"><div className="hero-intro"><h1 className="hero-welcome">HI, I’M KATE CRISTEN SANTOS.</h1><h2 className="hero-headline">WELCOME, AND ENJOY EXPLORING MY PORTFOLIO.</h2><div className="hero-supporting"><p className="hero-role">IT Student | Mobile and Web Developer &amp; Project Leader</p><p className="hero-description">{heroIntro}</p><div className="hero-actions"><a className="resume-link" href="/resume.pdf" target="_blank" rel="noopener noreferrer">View / Download Resume <ArrowUpRight size={15} aria-hidden="true"/></a><a className="resume-link" href="#projects" onClick={event => navigate(event, '#projects')}>View Works <ArrowUpRight size={15} aria-hidden="true"/></a></div></div></div><div className="hero-visual"><Portrait/></div></section>
+    <section id="about" tabIndex={-1} className="section-wrap content-section about-section"><div className="ambient-word" aria-hidden="true">ABOUT</div><Reveal><SectionTitle number="01" eyebrow="ABOUT ME" title={'Curious by nature.\nIntentional by design.'}/></Reveal><div className="about-grid"><Reveal><div className="about-statement">{aboutCopy.map(paragraph => <p key={paragraph}>{paragraph}</p>)}</div></Reveal><Reveal delay={0.08}><div className="about-aside"><span className="micro-label">WHAT I BRING TO THE TABLE</span><div className="about-list">{['Problem solving','Project coordination','Team collaboration','User-focused thinking'].map((item,i)=><div key={item}><span>0{i+1}</span><strong>{item}</strong><ArrowUpRight size={16}/></div>)}</div><p>I bring a mix of technical understanding, organization, and creativity to every project. I enjoy breaking down problems, coordinating with a team, and turning requirements into practical solutions that are useful to the people who will use them.</p></div></Reveal></div><div className="metrics-strip">{highlights.map(item=><div key={item.label}><strong>{item.value}</strong><span>{item.label}</span></div>)}</div><div className="about-leadership"><Reveal><div><span className="micro-label">LEADERSHIP EXPERIENCE</span><h3>Leading the work behind the work.</h3><p>Organization roles built on planning, clear communication, and steady team coordination.</p></div></Reveal><div className="timeline">{experience.map((entry,index)=><Reveal key={`${entry.year}-${entry.title}`} delay={index*.05}><article className="timeline-entry"><span>{entry.year}</span><div><h3>{entry.title}</h3><p className="timeline-org">{entry.organization}</p><ul>{entry.details.map(detail=><li key={detail}>{detail}</li>)}</ul></div></article></Reveal>)}</div></div></section>
+    <section id="projects" tabIndex={-1} className="section-wrap content-section projects-section"><div className="ambient-word" aria-hidden="true">PROJECTS</div><Reveal><SectionTitle number="02" eyebrow="PROJECTS" title="SELECTED WORKS" description="Projects I've built, developed, and led."/></Reveal><div className="projects-list">{projects.map((project,index)=><ProjectFeature key={project.title} project={project} onOpen={() => setSelectedProject(index)}/>)}</div></section>
     <section id="skills" tabIndex={-1} className="content-section skills-section"><div className="section-wrap"><Reveal><SectionTitle number="03" eyebrow="SKILLS & TOOLS" title={'A toolkit built\nfor making things work.'}/></Reveal></div><div className="marquee" aria-label="Featured technologies"><div className="marquee-track">{featuredSkills.map((skill,i)=><span key={`${skill}-${i}`}>{skill}<i>✳</i></span>)}</div></div><div className="section-wrap skills-grid">{techStacks.map((group,index)=><Reveal key={group.category} delay={Math.min(index*.04,.2)}><div className="skill-group"><div className="skill-heading"><span>0{index+1}</span><h3>{group.category}</h3></div><div className="skill-items">{group.items.map(item=><span key={item}>{item}</span>)}</div></div></Reveal>)}</div></section>
     <section id="credentials" tabIndex={-1} className="section-wrap content-section credentials-section"><Reveal><SectionTitle number="04" eyebrow="EDUCATION, CERTIFICATIONS & TRAINING" title="Learning, building, and growing." description="A record of study, verified technical certifications, and learning beyond the classroom."/></Reveal><div className="credential-subsection"><h3>Education</h3><div className="education-list">{education.map((entry,index)=><Reveal key={entry.school} delay={index*.06}><article><span className="education-number">0{index+1}</span><div><p className="micro-label">{entry.period}</p><h3>{entry.school}</h3><p>{entry.program}</p><p className="muted">{entry.detail}</p></div><ArrowUpRight size={22}/></article></Reveal>)}</div><Reveal><div className="award-line"><span>✳</span><div><p className="micro-label">AWARDS & ACHIEVEMENTS</p><h3>Consistent Dean’s Lister</h3><p>National University – Dasmariñas · First Honors every term except 1st Year, 1st Term (Second Honors).</p></div></div></Reveal></div><div className="credential-subsection"><h3>Certifications</h3><div className="credential-gallery">{certifications.map((entry,index)=><Reveal key={entry.name}><CredentialEntry entry={entry} index={index}/></Reveal>)}</div></div><div className="credential-subsection"><h3>Trainings &amp; Seminars</h3><div className="training-gallery">{seminars.map((entry,index)=><Reveal key={entry.name}><CredentialEntry entry={entry} index={index} popup/></Reveal>)}</div></div></section>
     <section id="contact" tabIndex={-1} className="contact-section"><div className="section-wrap"><Reveal><div className="contact-top"><span className="eyebrow">05 / CONTACT</span><span>HAVE SOMETHING IN MIND?</span></div><h2>Let's make<br/><em>something</em> happen<span>.</span></h2><p>Reach out about development projects, collaborations, or opportunities.</p><a className="contact-email" href={socials[2].href}>Open email <ArrowUpRight size={23}/></a><form className="contact-form" onSubmit={handleSubmit}>
   <div className="contact-form-heading"><span className="micro-label">SEND A MESSAGE</span><span>DIRECT INQUIRY</span></div>
   <div className="contact-form-row">
-    <label><span>Name</span><input name="name" value={form.name} onChange={handleChange('name')} placeholder="Your name" autoComplete="name" /></label>
-    <label><span>Email</span><input name="email" type="email" value={form.email} onChange={handleChange('email')} placeholder="Your email" autoComplete="email" /></label>
+    <label><span>Name</span><input name="name" value={form.name} onChange={handleChange('name')} placeholder="Your name" autoComplete="name" required maxLength={100} /></label>
+    <label><span>Email</span><input name="email" type="email" value={form.email} onChange={handleChange('email')} placeholder="Your email" autoComplete="email" required maxLength={254} /></label>
   </div>
-  <label className="contact-message"><span>Message</span><textarea name="message" value={form.message} onChange={handleChange('message')} placeholder="Tell me about your project or collaboration idea" /></label>
-  <div className="contact-form-action"><button type="submit">Send message <ArrowUpRight size={18} aria-hidden="true"/></button><p role="status">{status === 'sent' ? 'Your email client is opening.' : 'This form opens a prefilled email draft for quick contact.'}</p></div>
+  <label className="contact-message"><span>Message</span><textarea name="message" value={form.message} onChange={handleChange('message')} placeholder="Tell me about your project or collaboration idea" required maxLength={5000} /></label>
+  <div className="contact-form-action"><button type="submit" disabled={status === 'sending'}>{status === 'sending' ? 'Sending…' : 'Send message'} <ArrowUpRight size={18} aria-hidden="true"/></button><p role={status === 'error' ? 'alert' : 'status'} aria-live="polite">{status === 'sending' ? 'Sending your message…' : status === 'sent' ? 'Message sent successfully.' : status === 'error' ? errorMessage : ''}</p></div>
 </form><div className="contact-bottom"><div><span className="micro-label">SOCIAL LINKS</span><div className="social-links"><a href={socials[0].href} target="_blank" rel="noreferrer"><Github size={18}/> GitHub <ArrowUpRight size={14}/></a><a href={socials[1].href} target="_blank" rel="noreferrer"><Linkedin size={18}/> LinkedIn <ArrowUpRight size={14}/></a><a href={socials[2].href}><Mail size={18}/> Email <ArrowUpRight size={14}/></a></div></div><div className="collab-note"><span className="micro-label">OPEN TO COLLABORATION</span><p>I enjoy working with teams on mobile and web applications, from planning through implementation.</p></div></div></Reveal></div></section>
-  </main><footer className="site-footer"><div className="section-wrap"><span>© 2026 KATE CRISTEN SANTOS</span></div></footer></div>;
+  </main><footer className="site-footer"><div className="section-wrap"><span>© 2026 KATE CRISTEN SANTOS</span><button type="button" className="return-intro" onClick={returnToIntro}>Return to intro <ArrowUpRight size={13} aria-hidden="true"/></button></div></footer></div>}{selectedProject !== null && <ProjectCaseStudy index={selectedProject} onChange={setSelectedProject} onClose={() => setSelectedProject(null)}/>}</>;
 }
 export default App;

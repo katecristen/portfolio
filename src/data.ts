@@ -1,4 +1,4 @@
-export type Project = { title: string; subtitle?: string; role: string; stack: string[]; details: string[]; liveDemo?: string; images?: { src: string; alt: string }[] };
+export type Project = { title: string; subtitle: string; role: string; stack: string[]; details: string[]; liveDemo?: string; video?: string; images: { src: string; alt: string }[] };
 export type Experience = { year: string; title: string; organization: string; details: string[] };
 
 export const navLinks = [
@@ -10,7 +10,7 @@ export const navLinks = [
 ] as const;
 
 export const highlights = [
-  { value: '04', label: 'Software projects' },
+  { value: '05', label: 'Software projects' },
   { value: '03', label: 'Organization roles' },
   { value: '02', label: 'Certiport credentials' },
 ] as const;
@@ -26,11 +26,21 @@ export const techStacks = [
 
 export const projects: Project[] = [
   {
+    title: 'Maddy & Cassy Rentals',
+    subtitle: 'E-Commerce Rental Platform',
+    role: 'Project Leader · Backend Developer',
+    stack: ['Next.js 16', 'React 19', 'TypeScript', 'Supabase', 'React Hook Form', 'Zod', 'pdf-lib', 'react-signature-canvas', 'GSAP'],
+    details: ['E-commerce rental platform for products, bookings, payments, and rental agreements.', 'Led the project and developed backend functionality with Supabase and PostgreSQL.'],
+    liveDemo: 'https://maddyandcassyrentals-nine.vercel.app/',
+    images: [{ src: '/rental-home.png', alt: 'Maddy & Cassy Rentals storefront' }],
+  },
+  {
     title: 'OSCAFlow',
-    subtitle: 'An OCR-Assisted Mobile and Intelligent Web System for CSWDO-OSCA Operations',
-    role: 'Capstone Project · Project Manager & Developer',
-    stack: ['Flutter', 'Vue.js'],
+    subtitle: 'OCR-Assisted Mobile & Web System',
+    role: 'Project Manager · Developer',
+    stack: ['Flutter', 'Vue.js', 'Laravel', 'MariaDB', 'Microsoft Azure AI'],
     details: [
+      'OSCAFlow is an OCR-assisted mobile and web system that digitizes senior citizen records and streamlines CSWDO-OSCA administrative processes—from registration and duplicate checking to benefits, certificates, reports, and record management.',
       'Managed project planning, task assignments, development progress, and team coordination.',
       'Contributed to mobile and web application features based on project requirements.',
       'Collaborated throughout system design, development, testing, and implementation.',
@@ -42,37 +52,43 @@ export const projects: Project[] = [
   },
   {
     title: 'NUD ITSO ID Tracker',
-    role: 'Project Manager & Web Developer',
-    stack: ['React 19', 'Vite', 'Tailwind CSS', 'Node.js', 'Express.js', 'MongoDB', 'Google APIs'],
+    subtitle: 'ID Appointment & Tracking System',
+    role: 'Project Manager · Web Developer',
+    stack: ['React 19', 'Vite', 'Tailwind CSS', 'React Router', 'Node.js', 'Express', 'MongoDB', 'Mongoose', 'JWT', 'Google Calendar API', 'Nodemailer', 'QR codes'],
     details: [
+      'NUD ITSO ID Tracker is a student ID appointment and tracking system developed for the NU Dasmariñas IT Services Office (ITSO). The system streamlines the ID application process by allowing students to schedule appointments, monitor the status of their requests, and receive updates throughout the process until their IDs are ready for pickup.',
       'Managed development tasks and coordination among team members.',
       'Contributed to ID appointment management, tracking, notifications, and Google Calendar integration.',
       'Participated in system testing, implementation, and feature refinement.',
     ],
+    video: '/nud-itso-id-tracker-walkthrough.mp4',
     images: [{ src: '/nud-itso-id-tracker.png', alt: 'NU Dasmariñas ITSO ID Tracker home page with a student ID appointment call to action' }],
   },
   {
-    title: 'IOS Rental by Maddy and Cassy',
-    role: 'Project Leader & Backend Developer',
-    stack: ['Next.js', 'Supabase', 'PostgreSQL', 'Git/GitHub', 'Vercel'],
-    details: [
-      'Led development of an e-commerce rental platform for products, bookings, payments, and rental agreements.',
-      'Developed backend functionality and database operations using Supabase and PostgreSQL.',
-      'Managed version control using Git/GitHub and deployed the application through Vercel.',
-    ],
-    liveDemo: 'https://maddyandcassyrentals-nine.vercel.app/',
-    images: [{ src: '/rental-home.png', alt: 'Maddy and Cassy camera and phone rental storefront' }],
-  },
-  {
-    title: 'Yogee — Web-Based Event Reservation and Management System',
-    subtitle: 'Event reservations, package selection, and reservation tracking',
+    title: 'Yogee',
+    subtitle: 'Web-Based Event Reservation & Management System',
     role: 'Backend Developer',
     stack: ['HTML', 'CSS', 'JavaScript', 'PHP', 'PostgreSQL', 'Neon'],
     details: [
+      'A web-based event reservation and management system for Yogee that allows users to select available dates, make reservations, and manage their event bookings.',
       'Developed backend functionality for event reservations, package selection, and customer authentication.',
       'Implemented document uploads and reservation tracking to support the event booking workflow.',
     ],
+    video: '/yogee-nav.mp4',
     images: [{ src: '/yogee-home.png', alt: 'Yogee event reservation and management system' }],
+  },
+  {
+    title: 'BeautiVerse Digi',
+    subtitle: 'Beauty Product Ordering & Management System',
+    role: 'Web Developer',
+    stack: ['React 19', 'Vite', 'Recharts', 'PHP', 'MySQL'],
+    details: [
+      'A web-based beauty product platform where customers can browse products and place orders, while employees and administrators manage products and track orders from pending to completed.',
+      'Developed for an Advanced Security course project, with product browsing, ordering, and order management features.',
+      'Applied web development and security concepts throughout the system.',
+    ],
+    video: '/beautiverse-nav.mp4',
+    images: [{ src: '/beautiverse-dashboard.png', alt: 'BeautiVerse Digi employee dashboard and customer sign-in screens' }],
   },
 ];
 
@@ -183,5 +199,8 @@ export const socials = [
   { label: 'Email', href: 'mailto:keytcristen26@gmail.com' },
 ] as const;
 
-export const heroIntro = 'I build mobile and web applications, connect the backend systems behind them, and lead teams from the first requirements to the final implementation. A BSIT student with hands-on experience making software and projects work.';
-export const aboutCopy = 'I develop mobile and web applications, coordinate project tasks, and work with teams from system design through implementation. My academic and organizational projects have given me practical experience with frontend and backend technologies, databases, development tools, and UI/UX design.';
+export const heroIntro = 'I’m a BSIT student at NU Dasmariñas with hands-on experience in developing web and mobile applications, building backend systems, and leading projects from initial requirements to final implementation. I enjoy turning ideas into functional and user-focused software.';
+export const aboutCopy = [
+  'I originally wanted to pursue medicine and chose STEM in senior high school with the goal of becoming a doctor. But during our senior high school capstone, I became curious about a project that used a verified ID to unlock a locker. Seeing the code behind something I could actually interact with sparked my interest in technology.',
+  'That curiosity led me to IT, where I discovered that I enjoy solving problems, understanding how things work, and turning ideas into something people can actually use.',
+] as const;
